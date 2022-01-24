@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Carter+One&family=Chewy&family=Overlock&display=swap");
+
+:root {
+  --primary-black: #252422;
+  --primary-white: #fffcf2;
+  --highlight: #eb5e28;
+  --highlight-contrast: #fff1b9;
+}
+
+body {
+  font-family: "Overlock", cursive;
+}
+
+h1 {
+  font-family: "Carter One", cursive;
+}
+
+main {
+  width: 90%;
+  margin: auto;
+}
+
+nav {
+  background: var(--primary-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 3em;
+  box-shadow: 2px 2px 4px grey;
+  margin-bottom: 1em;
+}
+
+a {
+  text-decoration: none;
+  color: var(--highlight);
+}
+
+h4 {
+  margin: 0;
+  font-size: 1em;
+  text-align: center;
+}
+
+.Snacks article {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 1em;
+}
+
+.Snacks div {
+  width: 150px;
+  background: var(--primary-white);
+  padding: 1em;
+  box-shadow: 1px 1px 4px grey;
+}
+
+.Snacks img {
+  width: 150px;
+}
+
+/************************************************
+ form & other provided CSS
+ ***********************************************/
+.New form {
+  margin: auto;
+  width: 60%;
+}
+
+input[type],
+textarea {
+  display: block;
+  width: 90%;
+  margin: auto;
+}
+
+input[type="submit"] {
+  width: 30%;
+}
+
+.New section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.New aside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-white);
+  padding: 2em;
+}
+
+img {
+  max-width: 300px;
+}
+
+.Snack {
+  margin-bottom: 1em;
+}
+
+.Snack a span > img {
+  width: 10px;
+  margin: 0 0.5em;
+}

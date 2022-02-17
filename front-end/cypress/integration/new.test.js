@@ -48,12 +48,9 @@ describe("The New page", () => {
       cy.get("form").submit();
       cy.url().should("eq", "http://localhost:3000/snacks");
       cy.visit("http://localhost:3000/snacks");
-      cy.contains("Potato Chips")
-        .children()
-        .eq(1)
-        .children()
-        .children()
-        .should("have.attr", "alt", "unhealthy food");
+      cy.contains("Potato Chips").within(() => {
+        cy.get("span img").should("have.attr", "alt", "unhealthy food");
+      });
     });
   });
 });

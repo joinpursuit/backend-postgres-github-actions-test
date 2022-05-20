@@ -1,10 +1,8 @@
-// http://vitaly-t.github.io/pg-promise/module-pg-promise.html
-const pgp = require("pg-promise")();
+const PGPromise = require("pg-promise")();
 require("dotenv").config();
 
 const { DATABASE_URL, PG_HOST, PG_PORT, PG_DATABASE, PG_USER } = process.env;
-// https://github.com/vitaly-t/pg-promise/wiki/Connection-Syntax#configuration-object
-const cn = DATABASE_URL
+const connection = DATABASE_URL
   ? {
       connectionString: DATABASE_URL,
       max: 30,
@@ -19,9 +17,6 @@ const cn = DATABASE_URL
       user: PG_USER,
     };
 
-// alt from express docs
-// var db = pgp('postgres://username:password@host:port/database')
-
-const db = pgp(cn);
+const db = PGPromise(connection);
 
 module.exports = db;

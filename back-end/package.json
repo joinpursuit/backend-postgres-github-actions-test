@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "db:init": "psql -U postgres -f db/schema.sql",
-    "db:seed": "psql -U postgres -f db/seed.sql",
+    "db:init": "node db/schema",
+    "db:seed": "node db/seeds",
     "start": "node server.js",
     "test": "jest --runInBand"
   },

@@ -8,88 +8,77 @@ const {
   deleteSnack,
 } = require("../queries/snacks");
 
-const confirmHealth = require("../confirmHealth.js");
+const isHealthy = require("./util/isHealthy.js");
+const formatName = require("./util/formatName.js");
 
 // INDEX
-snacks.get("/", async (req, res) => {
+snacks.get("/", async (_req, res, next) => {
   try {
-    const allSnacks = await getAllSnacks();
-    if (allSnacks.length > 0) {
-      res.json({
-        success: true,
-        payload: allSnacks,
-      });
-      res.json(allSnacks);
-    }
-  } catch (err) {
-    return err;
+    const payload = await getAllSnacks();
+    res.json({ success: true, payload });
+  } catch (error) {
+    next(error);
   }
 });
 
 // SHOW
-snacks.get("/:id", async (req, res) => {
-  const snack = await getSnack(req.params.id);
-  if (snack.id) {
-    res.json({
-      success: true,
-      payload: snack,
-    });
-  } else {
-    res.status(404).json({
-      success: false,
-      payload: "not found",
-    });
+snacks.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const payload = await getSnack(id);
+    res.json({ success: true, payload });
+  } catch (error) {
+    if (error.name === "QueryResultError") {
+      const message = `No resource found with ID of '${id}'`;
+      return next({ status: 404, message });
+    }
+
+    next(error);
   }
 });
 
 // CREATE
-snacks.post("/", async (req, res) => {
-  req.body.is_healthy = confirmHealth(req.body);
-  if (!req.body.image) {
-    req.body.image =
-      "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image";
+snacks.post("/", async (req, res, next) => {
+  const { name } = req.body;
+  if (!name) {
+    const message = `Resource must include the 'name' field`;
+    next({ status: 422, message });
   }
-  if (!req.body.name) {
-    res.status(422).json({
-      success: false,
-      payload: "Must include name field",
-    });
-  } else {
-    req.body.name = req.body.name
-      .split(" ")
-      .map((word) =>
-        word.length > 2
-          ? word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-          : word
-      )
-      .join(" ");
-    req.body.is_healthy = confirmHealth(req.body);
-    const snack = await newSnack(req.body);
-    res.json({
-      success: !!snack.id,
-      payload: snack,
-    });
+
+  try {
+    req.body.is_healthy = isHealthy(req.body);
+    req.body.name = formatName(name);
+
+    const payload = await newSnack(req.body);
+    res.json({ success: true, payload });
+  } catch (error) {
+    next(error);
   }
 });
-// UPDATE
 
+// UPDATE
 snacks.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const updatedBookmark = await updateSnack(id, req.body);
-  res.json({
-    success: !!updatedBookmark.id,
-    payload: updatedBookmark,
-  });
+  try {
+    const payload = await updateSnack(id, req.body);
+    res.json({
+      success: true,
+      payload,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
-// DELETE
-snacks.delete("/:id", async (req, res) => {
-  const { id } = req.params;
-  const deletedBookmark = await deleteSnack(id);
 
-  res.json({
-    success: !!deletedBookmark.id,
-    payload: deletedBookmark,
-  });
+// DELETE
+snacks.delete("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const payload = await deleteSnack(id);
+    res.json({ success: true, payload });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = snacks;

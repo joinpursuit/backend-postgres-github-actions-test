@@ -6,6 +6,7 @@
   "scripts": {
     "db:init": "node db/schema",
     "db:seed": "node db/seeds",
+    "dev": "nodemon server.js",
     "start": "node server.js",
     "test": "jest --runInBand"
   },
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "jest": "^27.0.4",
+    "nodemon": "^2.0.16",
     "supertest": "^6.1.3"
   }
 }

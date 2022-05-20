@@ -1,14 +1,14 @@
 const request = require("supertest");
 
-const snacks = require("../app.js");
-const db = require("../db/dbConfig.js");
+const app = require("../app.js");
+const db = require("../db");
 
-const confirmHealth = require("../confirmHealth.js");
+const isHealthy = require("./util/isHealthy");
 
 describe("Basic root route", () => {
   describe("/", () => {
     it("is able to make a successful get request to /, that returns a string", async () => {
-      const response = await request(snacks).get("/");
+      const response = await request(app).get("/");
       expect(response.text).toBe("Get Snack'n at Snack-a-log!");
     });
   });
@@ -34,7 +34,7 @@ describe("snacks", () => {
   describe("/snacks/:id", () => {
     describe("GET", () => {
       it("with correct id - fetches the correct snack", async () => {
-        const response = await request(snacks).get("/snacks/1");
+        const response = await request(app).get("/snacks/1");
         const parsedRes = JSON.parse(response.text);
 
         expect(parsedRes.success).toBe(true);
@@ -43,17 +43,16 @@ describe("snacks", () => {
       });
 
       it("with incorrect id - sets status to 404 and returns error key", async () => {
-        const response = await request(snacks).get("/snacks/98989898");
+        const response = await request(app).get("/snacks/98989898");
         const parsedRes = JSON.parse(response.text);
 
         expect(response.statusCode).toEqual(404);
         expect(parsedRes.success).toBe(false);
-        expect(parsedRes.payload).toMatch(/not found/);
       });
     });
     describe("DELETE", () => {
       it("with valid id - deletes the correct snack", async () => {
-        const response = await request(snacks).delete("/snacks/1").send();
+        const response = await request(app).delete("/snacks/1").send();
         const parsedRes = JSON.parse(response.text);
 
         expect(parsedRes.success).toBe(true);
@@ -62,7 +61,7 @@ describe("snacks", () => {
       });
 
       it("with invalid id - does not delete anything", async () => {
-        const response = await request(snacks).delete("/snacks/99999").send();
+        const response = await request(app).delete("/snacks/99999").send();
         const parsedRes = JSON.parse(response.text);
 
         expect(parsedRes.success).toBe(false);
@@ -132,7 +131,7 @@ describe("snacks", () => {
           },
         ];
 
-        const response = await request(snacks).get("/snacks").expect(200);
+        const response = await request(app).get("/snacks").expect(200);
         const parsedRes = JSON.parse(response.text);
 
         expect(parsedRes.payload).toEqual(expect.arrayContaining(expected));
@@ -141,7 +140,7 @@ describe("snacks", () => {
 
     describe("POST", () => {
       it("with valid snack name and image - can create a snack", async () => {
-        const response = await request(snacks).post("/snacks").send({
+        const response = await request(app).post("/snacks").send({
           name: "Spiders on a Log",
           image:
             "https://i3.wp.com/onmykidsplate.com/wp-content/uploads/2018/09/Halloween-Snack-Spider-Peanut-Butter-Celery.jpg",
@@ -158,8 +157,8 @@ describe("snacks", () => {
           "https://i3.wp.com/onmykidsplate.com/wp-content/uploads/2018/09/Halloween-Snack-Spider-Peanut-Butter-Celery.jpg"
         );
       });
-      it("with valid snack name, but no image- can create a snack with default image", async () => {
-        const response = await request(snacks).post("/snacks").send({
+      it("with valid snack name but no image - can create a snack with default image", async () => {
+        const response = await request(app).post("/snacks").send({
           name: "banana",
         });
 
@@ -174,7 +173,7 @@ describe("snacks", () => {
       });
 
       it("with valid snack name but lowercase - can create a capitalized snack (will NOT capitalize words with 2 letter or less)", async () => {
-        const response = await request(snacks).post("/snacks").send({
+        const response = await request(app).post("/snacks").send({
           name: "spiders on a log",
           image:
             "https://i3.wp.com/onmykidsplate.com/wp-content/uploads/2018/09/Halloween-Snack-Spider-Peanut-Butter-Celery.jpg",
@@ -191,7 +190,7 @@ describe("snacks", () => {
       });
 
       it("with valid snack name, will capitalize as expected", async () => {
-        const response = await request(snacks).post("/snacks").send({
+        const response = await request(app).post("/snacks").send({
           name: "COMBOS",
         });
 
@@ -203,7 +202,7 @@ describe("snacks", () => {
       });
 
       it("with valid snack name mixed capitalization - can create a properly capitalized snack", async () => {
-        const response = await request(snacks).post("/snacks").send({
+        const response = await request(app).post("/snacks").send({
           name: "FLAMIN' hot Cheetoes",
         });
 
@@ -213,24 +212,11 @@ describe("snacks", () => {
         expect(!!parsedRes.payload.id).toBe(true);
         expect(parsedRes.payload.name).toEqual("Flamin' Hot Cheetoes");
       });
-
-      it("with invalid fiber, protein or added_sugar- can NOT determine health of snack", async () => {
-        const response = await request(snacks).post("/snacks").send({
-          name: "Combos",
-          added_sugar: null,
-        });
-
-        const parsedRes = JSON.parse(response.text);
-
-        expect(parsedRes.success).toBe(true);
-        expect(!!parsedRes.payload.id).toBe(true);
-        expect(parsedRes.payload.is_healthy).toBe(null);
-      });
     });
 
     // describe("PUT", () => {
     //   it("with valid snack and id - updates the correct snack", async () => {
-    //     const response = await request(snacks).put("/snacks/1").send({
+    //     const response = await request(app).put("/snacks/1").send({
     //       name: "Snack Platter",
     //       image:
     //         "https://www.freshcravings.com/wp-content/uploads/2017/12/FC_MexicanSnack-Platter-1-1480x1480@2x.jpg",
@@ -247,7 +233,7 @@ describe("snacks", () => {
     //   });
 
     //   it("with invalid snack or id - responds with 422 and message", async () => {
-    //     const response = await request(snacks)
+    //     const response = await request(app)
     //       .put("/snacks/1")
     //       .send({ image: "http://no-name.test" });
 
@@ -262,31 +248,25 @@ describe("snacks", () => {
   describe("Snack Health Check", () => {
     describe("Snack Health: ♥ Enough fiber", () => {
       it("Checks if fiber is above five and added_sugar is below 5", () => {
-        expect(confirmHealth({ protein: 4, fiber: 5, added_sugar: 1 })).toBe(
-          true
-        );
+        expect(isHealthy({ protein: 4, fiber: 5, added_sugar: 1 })).toBe(true);
       });
     });
 
     describe("Snack Health: ♥ Enough protein", () => {
       it("Checks if protein is above 5 and added_sugar is below 5", () => {
-        expect(confirmHealth({ protein: 6, fiber: 2, added_sugar: 0 })).toBe(
-          true
-        );
+        expect(isHealthy({ protein: 6, fiber: 2, added_sugar: 0 })).toBe(true);
       });
     });
 
     describe("Snack Health: ♥ Enough fiber and protein", () => {
       it("Checks if protein is above 5 or fiber is above five and added_sugar is below 5", () => {
-        expect(confirmHealth({ protein: 8, fiber: 9, added_sugar: 3 })).toBe(
-          true
-        );
+        expect(isHealthy({ protein: 8, fiber: 9, added_sugar: 3 })).toBe(true);
       });
     });
 
     describe("Snack Health: ♡ Enough fiber, too much sugar", () => {
       it("Checks if fiber is above five and added_sugar is above 5", () => {
-        expect(confirmHealth({ protein: 2, fiber: 8, added_sugar: 10 })).toBe(
+        expect(isHealthy({ protein: 2, fiber: 8, added_sugar: 10 })).toBe(
           false
         );
       });
@@ -294,7 +274,7 @@ describe("snacks", () => {
 
     describe("Snack Health: ♡ Enough protein, too much sugar", () => {
       it("Checks if protein is above 5 and added_sugar is above 5", () => {
-        expect(confirmHealth({ protein: 22, fiber: 3, added_sugar: 11 })).toBe(
+        expect(isHealthy({ protein: 22, fiber: 3, added_sugar: 11 })).toBe(
           false
         );
       });
@@ -302,7 +282,7 @@ describe("snacks", () => {
 
     describe("Snack Health: ♡ Enough protein and fiber, too much sugar", () => {
       it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(confirmHealth({ protein: 5, fiber: 5, added_sugar: 13 })).toBe(
+        expect(isHealthy({ protein: 5, fiber: 5, added_sugar: 13 })).toBe(
           false
         );
       });
@@ -310,25 +290,21 @@ describe("snacks", () => {
 
     describe("Snack Health: ♡ Not enough protein nor fiber, too much sugar", () => {
       it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(confirmHealth({ protein: 1, fiber: 0, added_sugar: 6 })).toBe(
-          false
-        );
+        expect(isHealthy({ protein: 1, fiber: 0, added_sugar: 6 })).toBe(false);
       });
     });
 
     describe("Snack Health: ♡ Not enough protein nor fiber, nor too much sugar", () => {
       it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(confirmHealth({ protein: 1, fiber: 0, added_sugar: 2 })).toBe(
-          false
-        );
+        expect(isHealthy({ protein: 1, fiber: 0, added_sugar: 2 })).toBe(false);
       });
     });
 
     describe("Snack Health: Missing info", () => {
       it("Checks if protein, fiber and added_sugar have valid values", () => {
-        expect(
-          confirmHealth({ protein: "", fiber: "c", added_sugar: null })
-        ).toBe(null);
+        expect(isHealthy({ protein: "", fiber: "c", added_sugar: null })).toBe(
+          false
+        );
       });
     });
   });

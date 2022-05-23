@@ -46,10 +46,18 @@ const updateSnack = (id, snack) => {
   );
 };
 
+const getSnackReviews = (id) => {
+  return db.any(
+    "SELECT reviews.* FROM snacks JOIN reviews ON snacks.id = reviews.snack_id WHERE snacks.id = $1",
+    [id]
+  );
+};
+
 module.exports = {
   getAllSnacks,
   getSnack,
   newSnack,
   deleteSnack,
   updateSnack,
+  getSnackReviews,
 };

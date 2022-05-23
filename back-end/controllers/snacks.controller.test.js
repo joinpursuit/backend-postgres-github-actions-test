@@ -7,12 +7,16 @@ const db = require("../db");
 const dropTables = require("../db/schema/00.drop");
 const snacksTable = require("../db/schema/01.snacks");
 const seedSnacks = require("../db/seeds/01.snacks");
+const reviewsTable = require("../db/schema/02.reviews");
+const seedReviews = require("../db/seeds/02.reviews");
 
 describe("snacks", () => {
   beforeEach(async () => {
     await dropTables();
     await snacksTable();
     await seedSnacks();
+    await reviewsTable();
+    await seedReviews();
   });
 
   afterAll(() => {
@@ -260,6 +264,27 @@ describe("snacks", () => {
         expect(response.body.success).toBe(true);
         expect(!!response.body.payload.id).toBe(true);
         expect(response.body.payload.name).toEqual("Flamin' Hot Cheetoes");
+      });
+    });
+  });
+
+  describe("/snacks/:id/reviews", () => {
+    describe("GET", () => {
+      it("returns all associated reviews for the snack", async () => {
+        const response = await request(app).get("/snacks/1/reviews");
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.name).toEqual("Strawberries");
+        expect(response.body.payload.reviews.length).toEqual(3);
+        expect(response.body.payload.reviews[0].reviewer_name).toEqual("David");
+      });
+
+      it("fails when given an incorrect id", async () => {
+        const response = await request(app).get("/snacks/999/reviews");
+
+        expect(response.statusCode).toEqual(404);
+        expect(response.body.success).toBe(false);
       });
     });
   });

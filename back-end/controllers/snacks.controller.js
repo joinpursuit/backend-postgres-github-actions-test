@@ -6,6 +6,7 @@ const {
   newSnack,
   updateSnack,
   deleteSnack,
+  getSnackReviews,
 } = require("../queries/snacks");
 
 const isHealthy = require("./util/isHealthy.js");
@@ -26,6 +27,23 @@ snacks.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await getSnack(id);
+    res.json({ success: true, payload });
+  } catch (error) {
+    if (error.name === "QueryResultError") {
+      const message = `No resource found with ID of '${id}'`;
+      return next({ status: 404, message });
+    }
+
+    next(error);
+  }
+});
+
+// SHOW ASSOCIATED REVIEWS
+snacks.get("/:id/reviews", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const payload = await getSnack(id);
+    payload.reviews = await getSnackReviews(id);
     res.json({ success: true, payload });
   } catch (error) {
     if (error.name === "QueryResultError") {

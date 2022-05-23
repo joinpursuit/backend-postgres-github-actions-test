@@ -191,6 +191,62 @@ describe("reviews", () => {
           "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
         );
       });
+
+      it("sets the `reviewer_name` to 'Anonymous' if no `reviewer_name` is present", async () => {
+        const response = await request(app).post("/reviews").send({
+          content:
+            "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim.",
+          rating: 3,
+          snack_id: 1,
+        });
+
+        const parsedRes = JSON.parse(response.text);
+        expect(parsedRes.success).toBe(true);
+        expect(!!parsedRes.payload.id).toBe(true);
+        expect(parsedRes.payload.content).toEqual(
+          "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
+        );
+        expect(parsedRes.payload.reviewer_name).toEqual("Anonymous");
+      });
+
+      it("fails if the referenced `snack_id` does not match an existing snack", async () => {
+        const response = await request(app).post("/reviews").send({
+          content:
+            "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim.",
+          rating: 3,
+          reviewer_name: "Gina",
+          snack_id: 999,
+        });
+
+        const parsedRes = JSON.parse(response.text);
+        expect(parsedRes.success).toBe(false);
+      });
+
+      it("fails if the `rating` value is below 1", async () => {
+        const response = await request(app).post("/reviews").send({
+          content:
+            "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim.",
+          rating: 0,
+          reviewer_name: "Gina",
+          snack_id: 1,
+        });
+
+        const parsedRes = JSON.parse(response.text);
+        expect(parsedRes.success).toBe(false);
+      });
+
+      it("fails if the `rating` value is above 5", async () => {
+        const response = await request(app).post("/reviews").send({
+          content:
+            "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim.",
+          rating: 99,
+          reviewer_name: "Gina",
+          snack_id: 1,
+        });
+
+        const parsedRes = JSON.parse(response.text);
+        expect(parsedRes.success).toBe(false);
+      });
     });
   });
 });

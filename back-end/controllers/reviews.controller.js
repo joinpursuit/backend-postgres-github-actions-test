@@ -36,6 +36,14 @@ reviews.get("/:id", async (req, res, next) => {
 
 // CREATE
 reviews.post("/", async (req, res, next) => {
+  const { rating, reviewer_name } = req.body;
+  if (!rating || rating < 0 || rating > 5) {
+    const message = `Resource must include the 'rating' field and it must be a value between 0 and 5.`;
+    next({ status: 422, message });
+  }
+
+  if (!reviewer_name) req.body.reviewer_name = "Anonymous";
+
   try {
     const payload = await newReview(req.body);
     res.json({ success: true, payload });

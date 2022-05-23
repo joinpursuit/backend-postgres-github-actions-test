@@ -27,37 +27,33 @@ describe("reviews", () => {
     describe("GET", () => {
       it("with correct id - fetches the correct review", async () => {
         const response = await request(app).get("/reviews/1");
-        const parsedRes = JSON.parse(response.text);
 
-        expect(parsedRes.success).toBe(true);
-        expect(parsedRes.payload.id).toEqual(1);
-        expect(parsedRes.payload.reviewer_name).toEqual("David");
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.reviewer_name).toEqual("David");
       });
 
       it("with incorrect id - sets status to 404 and returns error key", async () => {
         const response = await request(app).get("/reviews/98989898");
-        const parsedRes = JSON.parse(response.text);
 
         expect(response.statusCode).toEqual(404);
-        expect(parsedRes.success).toBe(false);
+        expect(response.body.success).toBe(false);
       });
     });
     describe("DELETE", () => {
       it("with valid id - deletes the correct review", async () => {
         const response = await request(app).delete("/reviews/1").send();
-        const parsedRes = JSON.parse(response.text);
 
-        expect(parsedRes.success).toBe(true);
-        expect(parsedRes.payload.id).toEqual(1);
-        expect(parsedRes.payload.reviewer_name).toEqual("David");
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.reviewer_name).toEqual("David");
       });
 
       it("with invalid id - does not delete anything", async () => {
         const response = await request(app).delete("/reviews/99999").send();
-        const parsedRes = JSON.parse(response.text);
 
-        expect(parsedRes.success).toBe(false);
-        expect(parsedRes.payload.id).toBe(undefined);
+        expect(response.body.success).toBe(false);
+        expect(response.body.payload.id).toBe(undefined);
       });
     });
   });
@@ -168,9 +164,8 @@ describe("reviews", () => {
         ];
 
         const response = await request(app).get("/reviews").expect(200);
-        const parsedRes = JSON.parse(response.text);
 
-        expect(parsedRes.payload).toEqual(expect.arrayContaining(expected));
+        expect(response.body.payload).toEqual(expect.arrayContaining(expected));
       });
     });
 
@@ -184,10 +179,9 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        const parsedRes = JSON.parse(response.text);
-        expect(parsedRes.success).toBe(true);
-        expect(!!parsedRes.payload.id).toBe(true);
-        expect(parsedRes.payload.content).toEqual(
+        expect(response.body.success).toBe(true);
+        expect(!!response.body.payload.id).toBe(true);
+        expect(response.body.payload.content).toEqual(
           "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
         );
       });
@@ -200,13 +194,12 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        const parsedRes = JSON.parse(response.text);
-        expect(parsedRes.success).toBe(true);
-        expect(!!parsedRes.payload.id).toBe(true);
-        expect(parsedRes.payload.content).toEqual(
+        expect(response.body.success).toBe(true);
+        expect(!!response.body.payload.id).toBe(true);
+        expect(response.body.payload.content).toEqual(
           "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
         );
-        expect(parsedRes.payload.reviewer_name).toEqual("Anonymous");
+        expect(response.body.payload.reviewer_name).toEqual("Anonymous");
       });
 
       it("fails if the referenced `snack_id` does not match an existing snack", async () => {
@@ -218,8 +211,7 @@ describe("reviews", () => {
           snack_id: 999,
         });
 
-        const parsedRes = JSON.parse(response.text);
-        expect(parsedRes.success).toBe(false);
+        expect(response.body.success).toBe(false);
       });
 
       it("fails if the `rating` value is below 1", async () => {
@@ -231,8 +223,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        const parsedRes = JSON.parse(response.text);
-        expect(parsedRes.success).toBe(false);
+        expect(response.body.success).toBe(false);
       });
 
       it("fails if the `rating` value is above 5", async () => {
@@ -244,8 +235,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        const parsedRes = JSON.parse(response.text);
-        expect(parsedRes.success).toBe(false);
+        expect(response.body.success).toBe(false);
       });
     });
   });

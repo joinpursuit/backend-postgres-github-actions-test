@@ -25,7 +25,7 @@ const updateReview = (id, review) => {
   const { reviewer_name, content, rating, snack_id } = review;
 
   return db.one(
-    "UPDATE reviews SET reviewer_name=$1, content=$2, rating=$3 snack_id=$4 WHERE id=$5 RETURNING *",
+    "UPDATE reviews SET reviewer_name=$1, content=$2, rating=$3, snack_id=$4 WHERE id=$5 RETURNING *",
     [reviewer_name, content, rating, snack_id, id]
   );
 };

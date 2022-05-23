@@ -57,9 +57,18 @@ snacks.post("/", async (req, res, next) => {
 });
 
 // UPDATE
-snacks.put("/:id", async (req, res) => {
+snacks.put("/:id", async (req, res, next) => {
   const { id } = req.params;
+  const { name } = req.body;
+  if (!name) {
+    const message = `Resource must include the 'name' field`;
+    next({ status: 422, message });
+  }
+
   try {
+    req.body.is_healthy = isHealthy(req.body);
+    req.body.name = formatName(name);
+
     const payload = await updateSnack(id, req.body);
     res.json({
       success: true,

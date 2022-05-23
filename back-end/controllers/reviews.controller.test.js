@@ -56,6 +56,83 @@ describe("reviews", () => {
         expect(response.body.payload.id).toBe(undefined);
       });
     });
+    describe("PUT", () => {
+      it("updates a review", async () => {
+        const response = await request(app).put("/reviews/1").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 5, // Changed field
+          reviewer_name: "David",
+          snack_id: 1,
+        });
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.rating).toEqual(5);
+      });
+
+      it("fails if the ID does not match an existing review", async () => {
+        const response = await request(app).put("/reviews/99999").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 5, // Changed field
+          reviewer_name: "David",
+          snack_id: 1,
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("fails if the `snack_id` does not match an existing snack", async () => {
+        const response = await request(app).put("/reviews/1").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 4,
+          reviewer_name: "David",
+          snack_id: 99, // Changed field
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("fails if the `rating` value is set below 1", async () => {
+        const response = await request(app).put("/reviews/1").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 0, // Changed field
+          reviewer_name: "David",
+          snack_id: 1,
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("fails if the `rating` value is set above 5", async () => {
+        const response = await request(app).put("/reviews/1").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 99, // Changed field
+          reviewer_name: "David",
+          snack_id: 1,
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("sets the `reviewer_name` value to 'Anonymous' if there is an attempt to unset it", async () => {
+        const response = await request(app).put("/reviews/1").send({
+          content:
+            "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
+          rating: 4,
+          reviewer_name: "", // Changed field
+          snack_id: 1,
+        });
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.reviewer_name).toEqual("Anonymous");
+      });
+    });
   });
 
   describe("/reviews", () => {

@@ -1,5 +1,8 @@
 const db = require("../db/index.js");
 
+const DEFAULT_IMAGE =
+  "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image";
+
 const getAllSnacks = () => {
   return db.any("SELECT * FROM snacks");
 };
@@ -11,7 +14,7 @@ const getSnack = (id) => {
 const newSnack = (snack) => {
   const {
     name,
-    image = "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image",
+    image = DEFAULT_IMAGE,
     fiber = 0,
     protein = 0,
     added_sugar = 0,
@@ -33,7 +36,7 @@ const updateSnack = (id, snack) => {
     "UPDATE snacks SET name=$1, image=$2, fiber=$3, protein=$4,  added_sugar=$5, is_healthy=$6 where id=$7 RETURNING *",
     [
       snack.name,
-      snack.image,
+      snack.image || DEFAULT_IMAGE,
       snack.fiber,
       snack.protein,
       snack.added_sugar,

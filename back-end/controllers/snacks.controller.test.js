@@ -52,6 +52,82 @@ describe("snacks", () => {
         expect(response.body.payload.id).toBe(undefined);
       });
     });
+    describe("PUT", () => {
+      it("updates a snack", async () => {
+        const response = await request(app).put("/snacks/1").send({
+          name: "Strawberries",
+          image: "https://picsum.photos/id/1080/300/300",
+          fiber: 18, // Changed field
+          protein: 10,
+          added_sugar: 0,
+          is_healthy: true,
+        });
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.fiber).toEqual(18);
+      });
+
+      it("fails if the ID does not match an existing snack", async () => {
+        const response = await request(app).put("/snacks/99999").send({
+          name: "Strawberries",
+          image: "https://picsum.photos/id/1080/300/300",
+          fiber: 18, // Changed field
+          protein: 10,
+          added_sugar: 0,
+          is_healthy: true,
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("fails if the name is updated to be missing", async () => {
+        const response = await request(app).put("/snacks/99999").send({
+          name: "", // Changed field
+          image: "https://picsum.photos/id/1080/300/300",
+          fiber: 20,
+          protein: 10,
+          added_sugar: 0,
+          is_healthy: true,
+        });
+
+        expect(response.body.success).toBe(false);
+      });
+
+      it("will use the default image if a snack is updated where the image is removed", async () => {
+        const response = await request(app).put("/snacks/1").send({
+          name: "Strawberries",
+          image: "", // Changed field
+          fiber: 20,
+          protein: 10,
+          added_sugar: 0,
+          is_healthy: true,
+        });
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.image).toEqual(
+          "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image"
+        );
+      });
+
+      it("will appropriately capitalize update snack names", async () => {
+        const response = await request(app).put("/snacks/1").send({
+          name: "ORGANIC strawberries (on sale)",
+          image: "https://picsum.photos/id/1080/300/300",
+          fiber: 20,
+          protein: 10,
+          added_sugar: 0,
+          is_healthy: true,
+        });
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.payload.id).toEqual(1);
+        expect(response.body.payload.name).toEqual(
+          "Organic Strawberries (on Sale)"
+        );
+      });
+    });
   });
 
   describe("/snacks", () => {

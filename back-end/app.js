@@ -16,6 +16,8 @@ app.get("/", (req, res) => {
 
 const snacksController = require("./controllers/snackController.js");
 app.use("/snacks", snacksController);
+const reviewsController = require("./controllers/reviewController.js");
+app.use("/reviews", reviewsController);
 
 // PAGE NOT FOUND
 app.use((req, _res, next) => {

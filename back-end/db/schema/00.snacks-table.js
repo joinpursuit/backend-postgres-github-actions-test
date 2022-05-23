@@ -1,10 +1,5 @@
-const PGPromise = require("pg-promise");
 const db = require("../");
-const path = require("path");
-
-const fileName = path.basename(__filename, ".js");
-const filePath = path.join(__dirname, `${fileName}.sql`);
-const queryFile = new PGPromise.QueryFile(filePath);
+const queryFile = require("../helpers/getSQLFile")(__filename, __dirname);
 
 const drop = () => db.none(`DROP TABLE IF EXISTS snacks;`);
 

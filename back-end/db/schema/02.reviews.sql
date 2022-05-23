@@ -4,5 +4,5 @@ CREATE TABLE reviews (
   content TEXT,
   rating INTEGER,
   snack_id INTEGER,
-  FOREIGN KEY (snack_id) REFERENCES snacks(id)
+  FOREIGN KEY (snack_id) REFERENCES snacks(id) ON DELETE CASCADE
 );

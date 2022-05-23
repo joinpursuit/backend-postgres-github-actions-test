@@ -14,9 +14,9 @@ app.get("/", (req, res) => {
   res.status(200).send("Get Snack'n at Snack-a-log!");
 });
 
-const snacksController = require("./controllers/snackController.js");
+const snacksController = require("./controllers/snacks.controller.js");
 app.use("/snacks", snacksController);
-const reviewsController = require("./controllers/reviewController.js");
+const reviewsController = require("./controllers/reviews.controller.js");
 app.use("/reviews", reviewsController);
 
 // PAGE NOT FOUND

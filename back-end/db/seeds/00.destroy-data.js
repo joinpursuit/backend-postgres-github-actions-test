@@ -1,9 +1,5 @@
 const db = require("../");
 
-const dropSnacks = () => db.none(`DELETE FROM snacks;`);
-
-const run = async () => {
-  await dropSnacks();
-};
+const run = () => db.none(`DELETE FROM snacks;`);
 
 module.exports = run;

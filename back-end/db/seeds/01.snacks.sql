@@ -1,3 +1,5 @@
+ALTER SEQUENCE snacks_id_seq RESTART;
+
 INSERT INTO
   snacks (
     name,

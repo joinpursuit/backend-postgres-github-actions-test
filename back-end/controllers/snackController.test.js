@@ -4,12 +4,14 @@ const app = require("../app.js");
 
 // Database
 const db = require("../db");
-const resetSnacksTable = require("../db/schema/00.snacks-table");
+const dropTables = require("../db/schema/00.drop");
+const snacksTable = require("../db/schema/01.snacks");
 const seedSnacks = require("../db/seeds/01.snacks");
 
 describe("snacks", () => {
   beforeEach(async () => {
-    await resetSnacksTable();
+    await dropTables();
+    await snacksTable();
     await seedSnacks();
   });
 

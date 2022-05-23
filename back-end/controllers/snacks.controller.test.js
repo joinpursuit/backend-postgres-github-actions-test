@@ -42,7 +42,7 @@ describe("snacks", () => {
     });
     describe("DELETE", () => {
       it("with valid id - deletes the correct snack", async () => {
-        const response = await request(app).delete("/snacks/1").send();
+        const response = await request(app).delete("/snacks/1");
 
         expect(response.body.success).toBe(true);
         expect(response.body.payload.id).toEqual(1);
@@ -50,7 +50,7 @@ describe("snacks", () => {
       });
 
       it("with invalid id - does not delete anything", async () => {
-        const response = await request(app).delete("/snacks/99999").send();
+        const response = await request(app).delete("/snacks/99999");
 
         expect(response.body.success).toBe(false);
         expect(response.body.payload.id).toBe(undefined);

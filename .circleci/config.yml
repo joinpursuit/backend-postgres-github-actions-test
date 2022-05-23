@@ -12,11 +12,11 @@ executors:
           PG_USER: postgres
           PG_HOST: localhost
           PG_PORT: 5432
-          PG_DATABASE: snack_a_log
-          TEST_DATABASE_URL: postgresql://postgres@localhost/snack_a_log
+          PG_DATABASE: snack_a_log_test
+          TEST_DATABASE_URL: postgresql://postgres@localhost/snack_a_log_test
       - image: circleci/postgres:9.6.2-alpine
         environment:
-          POSTGRES_DB: snack_a_log
+          POSTGRES_DB: snack_a_log_test
           POSTGRES_USER: postgres
 
 commands:
@@ -39,8 +39,8 @@ commands:
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client
       # Create schema and seed the database
-      - run: psql -d $TEST_DATABASE_URL -f ./back-end/db/schema.sql
-      - run: psql -d $TEST_DATABASE_URL -f ./back-end/db/seed.sql
+      - run: cd ./back-end && npm run db:init
+      - run: cd ./back-end && npm run db:seed
       - run:
           name: Start server
           command: node ./back-end/server.js

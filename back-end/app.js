@@ -26,7 +26,7 @@ app.use((req, _res, next) => {
 });
 
 app.use((err, _req, res, _next) => {
-  console.error(err);
+  if (process.env.NODE_ENV !== "test") console.error(err);
   const { status = 500, message = "Something went wrong." } = err;
   res.status(status).json({
     success: false,

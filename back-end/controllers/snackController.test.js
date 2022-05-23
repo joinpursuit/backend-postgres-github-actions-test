@@ -1,30 +1,16 @@
 const request = require("supertest");
 
 const app = require("../app.js");
+
+// Database
 const db = require("../db");
-
-const isHealthy = require("./util/isHealthy");
-
-describe("Basic root route", () => {
-  describe("/", () => {
-    it("is able to make a successful get request to /, that returns a string", async () => {
-      const response = await request(app).get("/");
-      expect(response.text).toBe("Get Snack'n at Snack-a-log!");
-    });
-  });
-});
+const resetSnacksTable = require("../db/schema/00.snacks-table");
+const seedSnacks = require("../db/seeds/01.snacks");
 
 describe("snacks", () => {
   beforeEach(async () => {
-    await db.none("DELETE FROM snacks WHERE true");
-    await db.none("ALTER SEQUENCE snacks_id_seq RESTART");
-    await db.none(`INSERT INTO snacks (name, fiber, protein, added_sugar, is_healthy, image) VALUES
-    ('Strawberries', 20, 10, 0, true, 'https://picsum.photos/id/1080/300/300'),
-    ('Raspberries', 16, 4, 0, true, 'https://picsum.photos/id/102/300/300'),
-    ('Honey Covered Granola',  30, 12, 22, false, 'https://picsum.photos/id/312/300/300'),
-    ('New Wave Nuts', 11, 55, 9, true, 'https://picsum.photos/id/139/300/300'),
-    ('Raw Onions & Turnips', 11, 9, 9, true, 'https://picsum.photos/id/292/300/300'),
-    ('Healthy Birthday Cake Square', 4, 8, 19, false, 'https://content.nutrisystem.com/images/products/alc/large/BirthdayCakeSquare_L.jpg');`);
+    await resetSnacksTable();
+    await seedSnacks();
   });
 
   afterAll(() => {
@@ -211,100 +197,6 @@ describe("snacks", () => {
         expect(parsedRes.success).toBe(true);
         expect(!!parsedRes.payload.id).toBe(true);
         expect(parsedRes.payload.name).toEqual("Flamin' Hot Cheetoes");
-      });
-    });
-
-    // describe("PUT", () => {
-    //   it("with valid snack and id - updates the correct snack", async () => {
-    //     const response = await request(app).put("/snacks/1").send({
-    //       name: "Snack Platter",
-    //       image:
-    //         "https://www.freshcravings.com/wp-content/uploads/2017/12/FC_MexicanSnack-Platter-1-1480x1480@2x.jpg",
-    //       fiber: 6,
-    //       protein: 5,
-    //       added_sugar: 1,
-    //     });
-
-    //     const parsedRes = JSON.parse(response.text);
-
-    //     expect(parsedRes.success).toBe(true);
-    //     expect(parsedRes.payload.id).toEqual(1);
-    //     expect(parsedRes.payload.name).toEqual("Snack Platter");
-    //   });
-
-    //   it("with invalid snack or id - responds with 422 and message", async () => {
-    //     const response = await request(app)
-    //       .put("/snacks/1")
-    //       .send({ image: "http://no-name.test" });
-
-    //     const parsedRes = JSON.parse(response.text);
-
-    //     expect(response.statusCode).toEqual(422);
-    //     expect(parsedRes.success).toBe(false);
-    //     expect(parsedRes.payload).toMatch(/include all fields/);
-    //   });
-    // });
-  });
-  describe("Snack Health Check", () => {
-    describe("Snack Health: ♥ Enough fiber", () => {
-      it("Checks if fiber is above five and added_sugar is below 5", () => {
-        expect(isHealthy({ protein: 4, fiber: 5, added_sugar: 1 })).toBe(true);
-      });
-    });
-
-    describe("Snack Health: ♥ Enough protein", () => {
-      it("Checks if protein is above 5 and added_sugar is below 5", () => {
-        expect(isHealthy({ protein: 6, fiber: 2, added_sugar: 0 })).toBe(true);
-      });
-    });
-
-    describe("Snack Health: ♥ Enough fiber and protein", () => {
-      it("Checks if protein is above 5 or fiber is above five and added_sugar is below 5", () => {
-        expect(isHealthy({ protein: 8, fiber: 9, added_sugar: 3 })).toBe(true);
-      });
-    });
-
-    describe("Snack Health: ♡ Enough fiber, too much sugar", () => {
-      it("Checks if fiber is above five and added_sugar is above 5", () => {
-        expect(isHealthy({ protein: 2, fiber: 8, added_sugar: 10 })).toBe(
-          false
-        );
-      });
-    });
-
-    describe("Snack Health: ♡ Enough protein, too much sugar", () => {
-      it("Checks if protein is above 5 and added_sugar is above 5", () => {
-        expect(isHealthy({ protein: 22, fiber: 3, added_sugar: 11 })).toBe(
-          false
-        );
-      });
-    });
-
-    describe("Snack Health: ♡ Enough protein and fiber, too much sugar", () => {
-      it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(isHealthy({ protein: 5, fiber: 5, added_sugar: 13 })).toBe(
-          false
-        );
-      });
-    });
-
-    describe("Snack Health: ♡ Not enough protein nor fiber, too much sugar", () => {
-      it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(isHealthy({ protein: 1, fiber: 0, added_sugar: 6 })).toBe(false);
-      });
-    });
-
-    describe("Snack Health: ♡ Not enough protein nor fiber, nor too much sugar", () => {
-      it("Checks if protein is above 5 and fiber is above five and added_sugar is above 5", () => {
-        expect(isHealthy({ protein: 1, fiber: 0, added_sugar: 2 })).toBe(false);
-      });
-    });
-
-    describe("Snack Health: Missing info", () => {
-      it("Checks if protein, fiber and added_sugar have valid values", () => {
-        expect(isHealthy({ protein: "", fiber: "c", added_sugar: null })).toBe(
-          false
-        );
       });
     });
   });

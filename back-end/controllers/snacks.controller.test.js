@@ -4,24 +4,10 @@ const app = require("../app.js");
 
 // Database
 const db = require("../db");
-const dropTables = require("../db/schema/00.drop");
-const snacksTable = require("../db/schema/01.snacks");
-const seedSnacks = require("../db/seeds/01.snacks");
-const reviewsTable = require("../db/schema/02.reviews");
-const seedReviews = require("../db/seeds/02.reviews");
 
 describe("snacks", () => {
-  beforeEach(async () => {
-    await dropTables();
-    await snacksTable();
-    await seedSnacks();
-    await reviewsTable();
-    await seedReviews();
-  });
-
-  afterAll(() => {
-    db.$pool.end();
-  });
+  beforeEach(() => db.seed.run());
+  afterAll(() => db.destroy());
 
   describe("/snacks/:id", () => {
     describe("GET", () => {
@@ -196,6 +182,10 @@ describe("snacks", () => {
         ];
 
         const response = await request(app).get("/snacks").expect(200);
+        response.body.payload.forEach((resource) => {
+          delete resource.created_at;
+          delete resource.updated_at;
+        });
 
         expect(response.body.payload).toEqual(expect.arrayContaining(expected));
       });

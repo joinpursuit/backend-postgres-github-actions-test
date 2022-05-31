@@ -1,17 +1,19 @@
-const db = require("../db/index.js");
+const db = require("../db");
 
 const DEFAULT_IMAGE =
   "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image";
 
-const getAllSnacks = () => {
-  return db.any("SELECT * FROM snacks");
+const getAllSnacks = async () => {
+  const query = await db.raw("SELECT * FROM snacks");
+  return query.rows;
 };
 
-const getSnack = (id) => {
-  return db.one("SELECT * FROM snacks WHERE id=$1", id);
+const getSnack = async (id) => {
+  const query = await db.raw("SELECT * FROM snacks WHERE id=?", [id]);
+  return query.rows[0];
 };
 
-const newSnack = (snack) => {
+const newSnack = async (snack) => {
   const {
     name,
     image = DEFAULT_IMAGE,
@@ -21,36 +23,36 @@ const newSnack = (snack) => {
     is_healthy = false,
   } = snack;
 
-  return db.one(
-    "INSERT INTO snacks (name, image, fiber, protein, added_sugar, is_healthy) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
-    [name, image, fiber, protein, added_sugar, is_healthy]
+  const query = await db.raw(
+    "INSERT INTO snacks (name, image, fiber, protein, added_sugar, is_healthy) VALUES(:name, :image, :fiber, :protein, :added_sugar, :is_healthy) RETURNING *",
+    { name, image, fiber, protein, added_sugar, is_healthy }
   );
+  return query.rows[0];
 };
 
-const deleteSnack = (id) => {
-  return db.one("DELETE FROM snacks WHERE id = $1 RETURNING *", id);
+const deleteSnack = async (id) => {
+  const query = await db.raw("DELETE FROM snacks WHERE id = ? RETURNING *", [
+    id,
+  ]);
+  return query.rows[0];
 };
 
-const updateSnack = (id, snack) => {
-  return db.one(
-    "UPDATE snacks SET name=$1, image=$2, fiber=$3, protein=$4,  added_sugar=$5, is_healthy=$6 where id=$7 RETURNING *",
-    [
-      snack.name,
-      snack.image || DEFAULT_IMAGE,
-      snack.fiber,
-      snack.protein,
-      snack.added_sugar,
-      snack.is_healthy,
-      id,
-    ]
+const updateSnack = async (id, snack) => {
+  snack.image = snack.image || DEFAULT_IMAGE;
+
+  const query = await db.raw(
+    "UPDATE snacks SET name=:name, image=:image, fiber=:fiber, protein=:protein, added_sugar=:added_sugar, is_healthy=:is_healthy where id=:id RETURNING *",
+    { id, ...snack }
   );
+  return query.rows[0];
 };
 
-const getSnackReviews = (id) => {
-  return db.any(
-    "SELECT reviews.* FROM snacks JOIN reviews ON snacks.id = reviews.snack_id WHERE snacks.id = $1",
+const getSnackReviews = async (id) => {
+  const query = await db.raw(
+    "SELECT reviews.* FROM snacks JOIN reviews ON snacks.id = reviews.snack_id WHERE snacks.id = ?",
     [id]
   );
+  return query.rows;
 };
 
 module.exports = {

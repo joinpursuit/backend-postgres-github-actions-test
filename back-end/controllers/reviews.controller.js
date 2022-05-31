@@ -23,14 +23,13 @@ reviews.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await getReview(id);
-    res.json({ success: true, payload });
-  } catch (error) {
-    if (error.name === "QueryResultError") {
-      const message = `No resource found with ID of '${id}'`;
-      return next({ status: 404, message });
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
     }
 
-    next(error);
+    res.json({ success: true, payload });
+  } catch (error) {
+    return next(error);
   }
 });
 
@@ -39,7 +38,7 @@ reviews.post("/", async (req, res, next) => {
   const { rating, reviewer_name } = req.body;
   if (!rating || rating < 0 || rating > 5) {
     const message = `Resource must include the 'rating' field and it must be a value between 0 and 5.`;
-    next({ status: 422, message });
+    return next({ status: 422, message });
   }
 
   if (!reviewer_name) req.body.reviewer_name = "Anonymous";
@@ -59,17 +58,18 @@ reviews.put("/:id", async (req, res, next) => {
 
   if (!rating || rating < 0 || rating > 5) {
     const message = `Resource must include the 'rating' field and it must be a value between 0 and 5.`;
-    next({ status: 422, message });
+    return next({ status: 422, message });
   }
 
   if (!reviewer_name) req.body.reviewer_name = "Anonymous";
 
   try {
     const payload = await updateReview(id, req.body);
-    res.json({
-      success: true,
-      payload,
-    });
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    }
+
+    res.json({ success: true, payload });
   } catch (error) {
     next(error);
   }
@@ -80,6 +80,10 @@ reviews.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await deleteReview(id);
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    }
+
     res.json({ success: true, payload });
   } catch (error) {
     next(error);

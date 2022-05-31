@@ -1,33 +1,36 @@
-const db = require("../db/index.js");
+const db = require("../db");
 
-const getAllReviews = () => {
-  return db.any("SELECT * FROM reviews");
+const getAllReviews = async () => {
+  const query = await db.raw("SELECT * FROM reviews");
+  return query.rows;
 };
 
-const getReview = (id) => {
-  return db.one("SELECT * FROM reviews WHERE id=$1", id);
+const getReview = async (id) => {
+  const query = await db.raw("SELECT * FROM reviews WHERE id=?", [id]);
+  return query.rows[0];
 };
 
-const newReview = (review) => {
-  const { reviewer_name, content, rating, snack_id } = review;
-
-  return db.one(
-    "INSERT INTO reviews (reviewer_name, content, rating, snack_id) VALUES($1, $2, $3, $4) RETURNING *",
-    [reviewer_name, content, rating, snack_id]
+const newReview = async (review) => {
+  const query = await db.raw(
+    "INSERT INTO reviews (reviewer_name, content, rating, snack_id) VALUES(:reviewer_name, :content, :rating, :snack_id) RETURNING *",
+    review
   );
+  return query.rows[0];
 };
 
-const deleteReview = (id) => {
-  return db.one("DELETE FROM reviews WHERE id = $1 RETURNING *", id);
+const deleteReview = async (id) => {
+  const query = await db.raw("DELETE FROM reviews WHERE id = ? RETURNING *", [
+    id,
+  ]);
+  return query.rows[0];
 };
 
-const updateReview = (id, review) => {
-  const { reviewer_name, content, rating, snack_id } = review;
-
-  return db.one(
-    "UPDATE reviews SET reviewer_name=$1, content=$2, rating=$3, snack_id=$4 WHERE id=$5 RETURNING *",
-    [reviewer_name, content, rating, snack_id, id]
+const updateReview = async (id, review) => {
+  const query = await db.raw(
+    "UPDATE reviews SET reviewer_name = :reviewer_name, content = :content, rating = :rating, snack_id = :snack_id WHERE id = :id RETURNING *",
+    { id, ...review }
   );
+  return query.rows[0];
 };
 
 module.exports = {

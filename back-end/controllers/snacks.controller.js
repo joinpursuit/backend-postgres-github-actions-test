@@ -27,14 +27,13 @@ snacks.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await getSnack(id);
-    res.json({ success: true, payload });
-  } catch (error) {
-    if (error.name === "QueryResultError") {
-      const message = `No resource found with ID of '${id}'`;
-      return next({ status: 404, message });
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
     }
 
-    next(error);
+    res.json({ success: true, payload });
+  } catch (error) {
+    return next(error);
   }
 });
 
@@ -43,14 +42,13 @@ snacks.get("/:id/reviews", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await getSnack(id);
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    }
+
     payload.reviews = await getSnackReviews(id);
     res.json({ success: true, payload });
   } catch (error) {
-    if (error.name === "QueryResultError") {
-      const message = `No resource found with ID of '${id}'`;
-      return next({ status: 404, message });
-    }
-
     next(error);
   }
 });
@@ -60,7 +58,7 @@ snacks.post("/", async (req, res, next) => {
   const { name } = req.body;
   if (!name) {
     const message = `Resource must include the 'name' field`;
-    next({ status: 422, message });
+    return next({ status: 422, message });
   }
 
   try {
@@ -80,7 +78,7 @@ snacks.put("/:id", async (req, res, next) => {
   const { name } = req.body;
   if (!name) {
     const message = `Resource must include the 'name' field`;
-    next({ status: 422, message });
+    return next({ status: 422, message });
   }
 
   try {
@@ -88,10 +86,11 @@ snacks.put("/:id", async (req, res, next) => {
     req.body.name = formatName(name);
 
     const payload = await updateSnack(id, req.body);
-    res.json({
-      success: true,
-      payload,
-    });
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    }
+
+    res.json({ success: true, payload });
   } catch (error) {
     next(error);
   }
@@ -102,6 +101,10 @@ snacks.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const payload = await deleteSnack(id);
+    if (!payload) {
+      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    }
+
     res.json({ success: true, payload });
   } catch (error) {
     next(error);

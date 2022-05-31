@@ -8,6 +8,7 @@ executors:
     docker:
       - image: cimg/node:15.11.0
         environment:
+          NODE_ENV: test
           PORT: 3333
           PG_USER: postgres
           PG_HOST: localhost
@@ -39,8 +40,8 @@ commands:
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client
       # Create schema and seed the database
-      - run: cd ./back-end && npm run db:init
-      - run: cd ./back-end && npm run db:seed
+      - run: cd ./back-end && npm run knex migrate:latest
+      - run: cd ./back-end && npm run knex seed:run
       - run:
           name: Start server
           command: node ./back-end/server.js

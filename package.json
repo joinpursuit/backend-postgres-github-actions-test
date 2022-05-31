@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:setup": "cd back-end && npm i && npm run knex migrate:latest && npm run knex seed:run",
     "start": "cd back-end && npm i && npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

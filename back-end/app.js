@@ -30,10 +30,15 @@ app.use((req, _res, next) => {
 app.use((err, _req, res, _next) => {
   if (process.env.NODE_ENV !== "test") console.error(err);
   const { status = 500, message = "Something went wrong." } = err;
-  res.status(status).json({
-    success: false,
-    payload: message,
-  });
+
+  let response;
+  if (status === 500) {
+    response = { status: "error", message };
+  } else {
+    response = { status: "fail", data: message };
+  }
+
+  res.status(status).json(response);
 });
 
 // EXPORT

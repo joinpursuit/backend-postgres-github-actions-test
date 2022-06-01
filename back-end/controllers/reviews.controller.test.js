@@ -14,32 +14,31 @@ describe("reviews", () => {
       it("with correct id - fetches the correct review", async () => {
         const response = await request(app).get("/reviews/1");
 
-        expect(response.body.success).toBe(true);
-        expect(response.body.payload.id).toEqual(1);
-        expect(response.body.payload.reviewer_name).toEqual("David");
+        expect(response.body.status).toBe("success");
+        expect(response.body.data.review.id).toEqual(1);
+        expect(response.body.data.review.reviewer_name).toEqual("David");
       });
 
       it("with incorrect id - sets status to 404 and returns error key", async () => {
-        const response = await request(app).get("/reviews/98989898");
+        const response = await request(app).get("/reviews/999999999");
 
         expect(response.statusCode).toEqual(404);
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
     });
     describe("DELETE", () => {
       it("with valid id - deletes the correct review", async () => {
         const response = await request(app).delete("/reviews/1").send();
 
-        expect(response.body.success).toBe(true);
-        expect(response.body.payload.id).toEqual(1);
-        expect(response.body.payload.reviewer_name).toEqual("David");
+        expect(response.body.status).toBe("success");
+        expect(response.body.data).toEqual(null);
       });
 
       it("with invalid id - does not delete anything", async () => {
-        const response = await request(app).delete("/reviews/99999").send();
+        const response = await request(app).delete("/reviews/999999999").send();
 
-        expect(response.body.success).toBe(false);
-        expect(response.body.payload.id).toBe(undefined);
+        expect(response.statusCode).toEqual(404);
+        expect(response.body.status).toBe("fail");
       });
     });
     describe("PUT", () => {
@@ -52,13 +51,13 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(true);
-        expect(response.body.payload.id).toEqual(1);
-        expect(response.body.payload.rating).toEqual(5);
+        expect(response.body.status).toBe("success");
+        expect(response.body.data.review.id).toEqual(1);
+        expect(response.body.data.review.rating).toEqual(5);
       });
 
       it("fails if the ID does not match an existing review", async () => {
-        const response = await request(app).put("/reviews/99999").send({
+        const response = await request(app).put("/reviews/999999999").send({
           content:
             "Esse veniam pariatur adipisicing adipisicing non eiusmod eu sit ut nostrud aute.",
           rating: 5, // Changed field
@@ -66,7 +65,8 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.statusCode).toEqual(404);
+        expect(response.body.status).toBe("fail");
       });
 
       it("fails if the `snack_id` does not match an existing snack", async () => {
@@ -78,7 +78,7 @@ describe("reviews", () => {
           snack_id: 99, // Changed field
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
 
       it("fails if the `rating` value is set below 1", async () => {
@@ -90,7 +90,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
 
       it("fails if the `rating` value is set above 5", async () => {
@@ -102,7 +102,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
 
       it("sets the `reviewer_name` value to 'Anonymous' if there is an attempt to unset it", async () => {
@@ -114,9 +114,9 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(true);
-        expect(response.body.payload.id).toEqual(1);
-        expect(response.body.payload.reviewer_name).toEqual("Anonymous");
+        expect(response.body.status).toBe("success");
+        expect(response.body.data.review.id).toEqual(1);
+        expect(response.body.data.review.reviewer_name).toEqual("Anonymous");
       });
     });
   });
@@ -227,11 +227,14 @@ describe("reviews", () => {
         ];
 
         const response = await request(app).get("/reviews").expect(200);
-        response.body.payload.forEach((resource) => {
+        expect(response.body.data.reviews.length).toEqual(13);
+        response.body.data.reviews.forEach((resource) => {
           delete resource.created_at;
           delete resource.updated_at;
         });
-        expect(response.body.payload).toEqual(expect.arrayContaining(expected));
+        expect(response.body.data.reviews).toEqual(
+          expect.arrayContaining(expected)
+        );
       });
     });
 
@@ -245,9 +248,9 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(true);
-        expect(!!response.body.payload.id).toBe(true);
-        expect(response.body.payload.content).toEqual(
+        expect(response.body.status).toBe("success");
+        expect(response.body.data.review.id).toBeTruthy();
+        expect(response.body.data.review.content).toEqual(
           "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
         );
       });
@@ -260,12 +263,12 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(true);
-        expect(!!response.body.payload.id).toBe(true);
-        expect(response.body.payload.content).toEqual(
+        expect(response.body.status).toBe("success");
+        expect(response.body.data.review.id).toBeTruthy();
+        expect(response.body.data.review.content).toEqual(
           "Duis eiusmod anim nisi dolor culpa esse sunt dolor labore Lorem enim."
         );
-        expect(response.body.payload.reviewer_name).toEqual("Anonymous");
+        expect(response.body.data.review.reviewer_name).toEqual("Anonymous");
       });
 
       it("fails if the referenced `snack_id` does not match an existing snack", async () => {
@@ -277,7 +280,7 @@ describe("reviews", () => {
           snack_id: 999,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
 
       it("fails if the `rating` value is below 1", async () => {
@@ -289,7 +292,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
 
       it("fails if the `rating` value is above 5", async () => {
@@ -301,7 +304,7 @@ describe("reviews", () => {
           snack_id: 1,
         });
 
-        expect(response.body.success).toBe(false);
+        expect(response.body.status).toBe("fail");
       });
     });
   });

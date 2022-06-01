@@ -15,8 +15,8 @@ const formatName = require("./util/formatName.js");
 // INDEX
 snacks.get("/", async (_req, res, next) => {
   try {
-    const payload = await getAllSnacks();
-    res.json({ success: true, payload });
+    const snacks = await getAllSnacks();
+    res.json({ status: "success", data: { snacks } });
   } catch (error) {
     next(error);
   }
@@ -26,12 +26,15 @@ snacks.get("/", async (_req, res, next) => {
 snacks.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const payload = await getSnack(id);
-    if (!payload) {
-      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    const snack = await getSnack(id);
+    if (!snack) {
+      return next({
+        status: 404,
+        message: `No resource found with ID of '${id}'`,
+      });
     }
 
-    res.json({ success: true, payload });
+    res.json({ status: "success", data: { snack } });
   } catch (error) {
     return next(error);
   }
@@ -41,13 +44,16 @@ snacks.get("/:id", async (req, res, next) => {
 snacks.get("/:id/reviews", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const payload = await getSnack(id);
-    if (!payload) {
-      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    const snack = await getSnack(id);
+    if (!snack) {
+      return next({
+        status: 404,
+        message: `No resource found with ID of '${id}'`,
+      });
     }
 
-    payload.reviews = await getSnackReviews(id);
-    res.json({ success: true, payload });
+    snack.reviews = await getSnackReviews(id);
+    res.json({ status: "success", data: { snack } });
   } catch (error) {
     next(error);
   }
@@ -65,8 +71,8 @@ snacks.post("/", async (req, res, next) => {
     req.body.is_healthy = isHealthy(req.body);
     req.body.name = formatName(name);
 
-    const payload = await newSnack(req.body);
-    res.json({ success: true, payload });
+    const snack = await newSnack(req.body);
+    res.json({ status: "success", data: { snack } });
   } catch (error) {
     next(error);
   }
@@ -85,12 +91,15 @@ snacks.put("/:id", async (req, res, next) => {
     req.body.is_healthy = isHealthy(req.body);
     req.body.name = formatName(name);
 
-    const payload = await updateSnack(id, req.body);
-    if (!payload) {
-      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    const snack = await updateSnack(id, req.body);
+    if (!snack) {
+      return next({
+        status: 404,
+        message: `No resource found with ID of '${id}'`,
+      });
     }
 
-    res.json({ success: true, payload });
+    res.json({ status: "success", data: { snack } });
   } catch (error) {
     next(error);
   }
@@ -100,12 +109,15 @@ snacks.put("/:id", async (req, res, next) => {
 snacks.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const payload = await deleteSnack(id);
-    if (!payload) {
-      throw { status: 404, message: `No resource found with ID of '${id}'` };
+    const snack = await deleteSnack(id);
+    if (!snack) {
+      return next({
+        status: 404,
+        message: `No resource found with ID of '${id}'`,
+      });
     }
 
-    res.json({ success: true, payload });
+    res.json({ status: "success", data: null });
   } catch (error) {
     next(error);
   }

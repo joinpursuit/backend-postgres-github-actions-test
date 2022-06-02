@@ -1,10 +1,8 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 import HeartHealth from "./HeartHealth";
-
-const API = process.env.REACT_APP_API_URL;
+import api from "../api";
 
 function SnackDetails() {
   const [snack, setSnack] = useState([]);
@@ -12,25 +10,18 @@ function SnackDetails() {
   let navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${API}/snacks/${id}`).then(
-      (response) => {
-        setSnack(response.data.payload);
-      },
-      (error) => navigate(`/not-found`)
-    );
-  }, [id, API]);
+    api.snacks.getOne(id).then(setSnack);
+  }, [id]);
 
-  const deleteSnack = () => {
-    axios
-      .delete(`${API}/snacks/${id}`)
-      .then(
-        () => {
-          navigate(`/snacks`);
-        },
-        (error) => console.error(error)
-      )
-      .catch((c) => console.warn("catch", c));
+  const deleteSnack = async () => {
+    try {
+      await api.snacks.destroy(id);
+      navigate("/snacks");
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   const handleDelete = () => {
     deleteSnack();
   };

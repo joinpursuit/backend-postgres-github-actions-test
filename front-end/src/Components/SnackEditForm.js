@@ -1,8 +1,7 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API = process.env.REACT_APP_API_URL;
+import api from "../api";
 
 function SnackEditForm() {
   let { id } = useParams();
@@ -17,32 +16,18 @@ function SnackEditForm() {
     is_healthy: true,
   });
 
-  const updateSnack = (newSnack) => {
-    axios
-      .put(`${API}/snacks/${id}`, newSnack)
-      .then(
-        () => {
-          navigate(`/snacks`);
-        },
-        (error) => console.error(error)
-      )
-      .catch((c) => console.warn("catch", c));
+  const updateSnack = async (id, body) => {
+    try {
+      await api.snacks.update(id, body);
+      navigate(`/snacks/${id}`);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
-    axios
-      .get(`${API}/snacks/${id}`)
-      .then(
-        (response) => {
-          setSnack(response.data.payload);
-        },
-        (err) => {
-          console.error(err);
-          // navigate(`/not-found`);
-        }
-      )
-      .catch((c) => console.warn("catch", c));
-  }, [id, API]);
+    api.snacks.getOne(id).then(setSnack);
+  }, [id]);
 
   const handleTextChange = (event) => {
     setSnack({
@@ -53,8 +38,9 @@ function SnackEditForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    updateSnack(snack);
+    updateSnack(id, snack);
   };
+
   return (
     <section className="Edit">
       <aside>

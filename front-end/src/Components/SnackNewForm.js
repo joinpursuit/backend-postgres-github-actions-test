@@ -1,22 +1,14 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = process.env.REACT_APP_API_URL;
+import api from "../api";
 
 function SnackNewForm() {
   let navigate = useNavigate();
 
-  const addSnack = (newSnack) => {
-    axios
-      .post(`${API}/snacks`, newSnack)
-      .then(
-        () => {
-          navigate(`/snacks`);
-        },
-        (error) => console.error(error)
-      )
-      .catch((c) => console.warn("catch", c));
+  const addSnack = async (newSnack) => {
+    const snack = await api.snacks.create(newSnack);
+    navigate(`/snacks/${snack.id}`);
   };
 
   const [snack, setSnack] = useState({
@@ -39,6 +31,7 @@ function SnackNewForm() {
     event.preventDefault();
     addSnack(snack);
   };
+
   return (
     <section className="New">
       <aside>

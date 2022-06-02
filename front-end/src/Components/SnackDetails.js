@@ -10,7 +10,20 @@ function SnackDetails() {
   let navigate = useNavigate();
 
   useEffect(() => {
-    api.snacks.getOne(id).then(setSnack);
+    async function setSnackOrNavigateAway() {
+      try {
+        const response = await api.snacks.getOne(id);
+        if (!response) {
+          throw `No Snack with ID of ${id}.`;
+        }
+        setSnack(response);
+      } catch (error) {
+        console.error(error);
+        navigate("/not-found");
+      }
+    }
+
+    setSnackOrNavigateAway();
   }, [id]);
 
   const deleteSnack = async () => {
@@ -26,22 +39,21 @@ function SnackDetails() {
     deleteSnack();
   };
 
+  const { name, image, fiber, protein, added_sugar, is_healthy } = snack;
+
   return (
     <section>
       <article>
         <aside>
-          {" "}
-          <h4>
-            this snack is {snack.is_healthy ? null : <span>un</span>}healthy
-          </h4>
-          <HeartHealth snackHealth={snack.is_healthy} />
+          <h4>this snack is {is_healthy ? null : <span>un</span>}healthy</h4>
+          <HeartHealth snackHealth={is_healthy} />
         </aside>
         <div>
-          <h5>{snack.name}</h5>
-          <img src={snack.image} alt={snack.name} />
-          <h6>Protein: {snack.protein}</h6>
-          <h6>Fiber: {snack.fiber}</h6>
-          <h6>Added Sugar: {snack.added_sugar}</h6>
+          <h5>{name}</h5>
+          <img src={image} alt={name} />
+          <h6>Protein: {protein}</h6>
+          <h6>Fiber: {fiber}</h6>
+          <h6>Added Sugar: {added_sugar}</h6>
         </div>
         <div className="showNavigation">
           <div>

@@ -11,6 +11,11 @@ body {
   font-family: "Overlock", cursive;
 }
 
+header h1 {
+  margin: 0;
+  padding: 20px 0;
+}
+
 h1 {
   font-family: "Carter One", cursive;
 }

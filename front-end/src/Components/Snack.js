@@ -1,15 +1,16 @@
 import HeartHealth from "./HeartHealth";
 
 function Snack({ snack }) {
+  const { id, image, name, is_healthy } = snack;
   return (
     <div className="Snack">
-      <a href={`/snacks/${snack.id}`}>
-        <img src={snack.image} alt={snack.name} />
+      <a href={`/snacks/${id}`}>
+        <img src={image} alt={name} />
         <h4>
           <span>
-            <HeartHealth snackHealth={snack.is_healthy} />
+            <HeartHealth snackHealth={is_healthy} />
           </span>
-          {snack.name}
+          {name}
         </h4>
       </a>
     </div>

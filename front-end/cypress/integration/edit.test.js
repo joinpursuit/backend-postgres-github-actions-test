@@ -1,16 +1,19 @@
 const URL = Cypress.env("URL");
 const API = Cypress.env("API");
 
-let id = 1;
-
 describe("The Edit page", () => {
+  let id;
+
   before(() => {
-    cy.visit(`${URL}/snacks/${1}/edit`);
+    cy.createSnack(API).then((response) => {
+      id = response.body.data.snack.id;
+      cy.visit(`${URL}/snacks/${id}/edit`);
+    });
   });
 
   describe("the form", () => {
     // pay attention the capitalization!
-    // cypress needs accuracy to find elements on the DOM\
+    // cypress needs accuracy to find elements on the DOM
 
     it("has a form with correct labels and fields", () => {
       // for the form inputs we use label/input
@@ -33,14 +36,15 @@ describe("The Edit page", () => {
         .should("have.attr", "for", "added_sugar");
       cy.get("#added_sugar").should("have.attr", "type", "number");
     });
-    it("can update a snack and then redirects back to index page", () => {
+
+    it("can update a snack and then redirects back to the show page", () => {
       cy.get("#name").type("!!!!!!!!!");
       cy.get("#fiber").type(5);
       cy.get("#protein").type(1);
       cy.get("#added_sugar").type(0);
       cy.get("form").submit();
-      cy.url().should("eq", "http://localhost:3000/snacks");
-      cy.contains("Strawberries!!!!!!!!!");
+      cy.url().should("eq", `http://localhost:3000/snacks/${id}`);
+      cy.contains("!!!!!!!!!");
     });
   });
 });

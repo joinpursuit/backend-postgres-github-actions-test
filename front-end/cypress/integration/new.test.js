@@ -37,7 +37,7 @@ describe("The New page", () => {
       cy.get("#added_sugar").should("have.attr", "type", "number");
     });
 
-    it("can create a snack and then redirects back to index page", () => {
+    it("can create a snack and then redirects back to the show page", () => {
       cy.get("#name").type("Potato Chips");
       cy.get("#image").type(
         "https://dummyimage.com/400x400/6e6c6e/e9e9f5.png&text=No+Image"
@@ -46,11 +46,9 @@ describe("The New page", () => {
       cy.get("#protein").type("1");
       cy.get("#added_sugar").type("1");
       cy.get("form").submit();
-      cy.url().should("eq", "http://localhost:3000/snacks");
-      cy.visit("http://localhost:3000/snacks");
-      cy.contains("Potato Chips").within(() => {
-        cy.get("span img").should("have.attr", "alt", "unhealthy food");
-      });
+
+      cy.contains("Potato Chips");
+      cy.contains("All Snacks").should("not.exist");
     });
   });
 });

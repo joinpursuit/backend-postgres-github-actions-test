@@ -14,7 +14,7 @@ function SnackDetails() {
       try {
         const response = await api.snacks.getOne(id);
         if (!response) {
-          throw `No Snack with ID of ${id}.`;
+          throw new Error(`No Snack with ID of ${id}.`);
         }
         setSnack(response);
       } catch (error) {
@@ -24,7 +24,7 @@ function SnackDetails() {
     }
 
     setSnackOrNavigateAway();
-  }, [id]);
+  }, [id, navigate]);
 
   const deleteSnack = async () => {
     try {

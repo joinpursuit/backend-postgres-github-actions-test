@@ -10,8 +10,8 @@ app.use(cors());
 app.use(express.json()); // Parse incoming JSON
 
 // ROUTES
-app.get("/", (req, res) => {
-  res.status(200).send("Get Snack'n at Snack-a-log!");
+app.get("/ping", (_req, res) => {
+  res.status(204).send();
 });
 
 const snacksController = require("./controllers/snacks.controller.js");

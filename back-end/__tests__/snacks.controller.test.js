@@ -5,9 +5,11 @@ const app = require("../app.js");
 // Database
 const db = require("../db");
 
-describe("snacks", () => {
+describe("Snacks Resource", () => {
   beforeEach(() => db.seed.run());
   afterAll(() => db.destroy());
+
+  describe("Snack CRUD routes", () => {});
 
   describe("/snacks/:id", () => {
     describe("GET", () => {

@@ -6,8 +6,8 @@ const {
   newReview,
   updateReview,
   deleteReview,
-} = require("../queries/reviews");
-const { getSnack } = require("../queries/snacks");
+} = require("../models/review.model");
+const { getSnack } = require("../models/snack.model");
 
 // INDEX
 reviews.get("/", async (_req, res, next) => {

@@ -7,7 +7,7 @@ const {
   updateSnack,
   deleteSnack,
   getSnackReviews,
-} = require("../queries/snacks");
+} = require("../models/snack.model");
 
 const isHealthy = require("./util/isHealthy.js");
 const formatName = require("./util/formatName.js");

@@ -1,24 +1,12 @@
 const URL = Cypress.env("URL");
 const API = Cypress.env("API");
 
-let id = 0;
-
 describe("Show Page", () => {
+  let id;
+
   before(() => {
-    cy.request({
-      method: "POST",
-      url: `${API}/snacks`,
-      body: {
-        name: "Cherry Icee",
-        image:
-          "https://preview.redd.it/6bovojne7yl51.png?width=225&format=png&auto=webp&s=77aeac334ac53d995a155539c2614f2b488f279b",
-        fiber: 0,
-        protein: 0,
-        added_sugar: 30,
-      },
-      log: true,
-    }).then((newSnack) => {
-      id = newSnack.body.payload.id;
+    cy.createSnack(API).then((response) => {
+      id = response.body.data.snack.id;
       cy.visit(`${URL}/snacks/${id}`);
       cy.wait(1000);
     });

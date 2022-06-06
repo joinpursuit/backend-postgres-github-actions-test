@@ -1,21 +1,23 @@
 {
-  "name": "bookmarks-mono-repo",
+  "name": "project-snack-a-log",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cd back-end && npm i && npm start",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/joinpursuit/bookmarks-mono-repo.git"
+    "install:all": "npm-run-all install:front-end install:back-end",
+    "install:front-end": "cd front-end && npm i",
+    "install:back-end": "cd back-end && npm i",
+    "db:setup": "npm-run-all db:migrate db:seed",
+    "db:migrate": "cd back-end && npm run knex migrate:latest",
+    "db:seed": "cd back-end && npm run knex seed:run",
+    "start": "npm-run-all --parallel start:front-end start:back-end",
+    "start:front-end": "cd front-end && npm start",
+    "start:back-end": "cd back-end && npm start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/joinpursuit/bookmarks-mono-repo/issues"
-  },
-  "homepage": "https://github.com/joinpursuit/bookmarks-mono-repo#readme"
+  "dependencies": {
+    "npm-run-all": "^4.1.5"
+  }
 }

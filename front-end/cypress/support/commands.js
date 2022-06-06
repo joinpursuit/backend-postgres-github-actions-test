@@ -23,3 +23,21 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add("createSnack", (url) => {
+  return cy.request({
+    method: "POST",
+    url: `${url}/snacks`,
+    body: {
+      name: "Cherry Icee",
+      image:
+        "https://preview.redd.it/6bovojne7yl51.png?width=225&format=png&auto=webp&s=77aeac334ac53d995a155539c2614f2b488f279b",
+      fiber: 0,
+      protein: 0,
+      added_sugar: 30,
+    },
+  });
+});
+
+Cypress.Commands.add("getAllSnacks", (url) => {
+  return cy.request({ method: "GET", url: `${url}/snacks` });
+});

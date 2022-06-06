@@ -3,8 +3,13 @@ const API = Cypress.env("API");
 const CI_ENV = Cypress.env("ci");
 
 describe("index page", () => {
+  let id;
+
   before(() => {
-    cy.visit(`${URL}/snacks`);
+    cy.createSnack(API).then((response) => {
+      id = response.body.data.snack.id;
+      cy.visit(`${URL}/snacks`);
+    });
   });
 
   it("can load index page and has navigation to New page", () => {
@@ -46,11 +51,6 @@ describe("index page", () => {
       cy.get("h1")
         .should("have.css", "font-family")
         .and("match", /Carter One/);
-    });
-
-    it("has main with width 90 and centered using margin auto", () => {
-      cy.get("main").should("have.css", "width").and("match", /90/);
-      cy.get("main").should("have.css", "margin").and("match", /0/);
     });
 
     it("has nav background-color rgb(37, 36, 34)", () => {

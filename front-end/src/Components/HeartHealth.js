@@ -14,7 +14,3 @@ function HeartHealth({ snackHealth }) {
 }
 
 export default HeartHealth;
-
-{
-  /* <p>???</p> */
-}

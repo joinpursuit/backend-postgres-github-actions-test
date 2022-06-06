@@ -6,20 +6,8 @@ let id = 0;
 
 describe("Show Page", () => {
   before(() => {
-    cy.request({
-      method: "POST",
-      url: `${API}/snacks`,
-      body: {
-        name: "Raspberries",
-        image: "https://picsum.photos/id/102/300/300",
-        fiber: 16,
-        protein: 4,
-        added_sugar: 0,
-        is_healthy: true,
-      },
-      log: true,
-    }).then((newSnack) => {
-      id = newSnack.body.payload.id;
+    cy.createSnack(API).then((response) => {
+      id = response.body.data.snack.id;
       cy.visit(`${URL}/snacks/${id}`);
     });
   });
@@ -36,19 +24,19 @@ describe("Show Page", () => {
 
   describe("snack with its information", () => {
     it("shows the correct healthy heart image", () => {
-      cy.get("aside img").should("have.attr", "alt", "healthy food");
+      cy.get("aside img").should("have.attr", "alt", "unhealthy food");
     });
     it("shows the image of the snack", () => {
-      cy.get("article div img").should("have.attr", "alt", "Raspberries");
+      cy.get("article div img").should("have.attr", "alt", "Cherry Icee");
     });
     it("shows the protein amount of the snack", () => {
-      cy.get("article div").contains("Protein: 4");
+      cy.get("article div").contains("Protein: 0");
     });
     it("shows the fiber amount of the snack", () => {
-      cy.get("article div").contains("Fiber: 16");
+      cy.get("article div").contains("Fiber: 0");
     });
     it("shows the Added Sugar of the snack", () => {
-      cy.get("article div").contains("Added Sugar: 0");
+      cy.get("article div").contains("Added Sugar: 30");
     });
   });
 

@@ -11,8 +11,21 @@ body {
   font-family: "Overlock", cursive;
 }
 
+header h1 {
+  margin: 0;
+  padding: 20px 0;
+}
+
 h1 {
   font-family: "Carter One", cursive;
+}
+
+h1 span {
+  color: var(--primary-white);
+  display: block;
+  letter-spacing: 1px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
 }
 
 main {

@@ -1,22 +1,14 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API = process.env.REACT_APP_API_URL;
+import api from "../api";
 
 function SnackNewForm() {
   let navigate = useNavigate();
 
-  const addSnack = (newSnack) => {
-    axios
-      .post(`${API}/snacks`, newSnack)
-      .then(
-        () => {
-          navigate(`/snacks`);
-        },
-        (error) => console.error(error)
-      )
-      .catch((c) => console.warn("catch", c));
+  const addSnack = async (newSnack) => {
+    const snack = await api.snacks.create(newSnack);
+    navigate(`/snacks/${snack.id}`);
   };
 
   const [snack, setSnack] = useState({
@@ -39,6 +31,9 @@ function SnackNewForm() {
     event.preventDefault();
     addSnack(snack);
   };
+
+  const { name, image, fiber, protein, added_sugar } = snack;
+
   return (
     <section className="New">
       <aside>
@@ -55,7 +50,7 @@ function SnackNewForm() {
         <label htmlFor="name">Name:</label>
         <input
           id="name"
-          value={snack.name}
+          value={name}
           type="text"
           onChange={handleTextChange}
           required
@@ -64,7 +59,7 @@ function SnackNewForm() {
         <input
           id="image"
           type="text"
-          value={snack.image}
+          value={image}
           placeholder="http://"
           onChange={handleTextChange}
         />
@@ -75,7 +70,7 @@ function SnackNewForm() {
           min="0"
           step="1"
           name="fiber"
-          value={snack.fiber}
+          value={fiber}
           placeholder="in grams, integers only"
           onChange={handleTextChange}
         />
@@ -84,7 +79,7 @@ function SnackNewForm() {
           id="protein"
           type="number"
           name="protein"
-          value={snack.protein}
+          value={protein}
           placeholder="in grams, integers only"
           onChange={handleTextChange}
         />
@@ -93,7 +88,7 @@ function SnackNewForm() {
           id="added_sugar"
           type="number"
           name="added_sugar"
-          value={snack.added_sugar}
+          value={added_sugar}
           placeholder="in grams, integers only"
           onChange={handleTextChange}
         />

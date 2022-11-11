@@ -50,4 +50,4 @@ jobs:
           POSTGRES_PORT: 5432
           TEST_DATABASE_URL: postgres://postgres@localhost:5432/snack_a_log_test
           REACT_APP_API_URL: http://localhost:5001
-          PORT: 5001
+          # PORT: 5001

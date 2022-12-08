@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-node@v3
           with:
-            node-version: '16'
+            node-version: '14'
 
       # Performs a clean installation of all dependencies in the `package.json` file
       # For more information, see https://docs.npmjs.com/cli/ci.html

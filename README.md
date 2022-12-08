@@ -23,16 +23,16 @@ To get the project up and running, you will need to complete the following steps
 1. In the `back-end/` directory, create a `.env` file with the following contents:
 
    ```
-   PORT=5000
+   PORT=5001
    DATABASE_URL=postgres://postgres@localhost:5432/snack_a_log_dev
    TEST_DATABASE_URL=postgres://postgres@localhost:5432/snack_a_log_test
    ```
 
 1. In the `front-end/` directory, create a `.env` file with the following contents:
 
-   ```
-   REACT_APP_API_URL=http://localhost:5000
-   ```
+   ````
+   REACT_APP_API_URL=http://localhost:5001   ```
+   ````
 
 ### Running the application
 
